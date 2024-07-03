@@ -35,20 +35,20 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                 </li>
+					{% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
                 {% endif %}
             </ul>
         </div>
     </nav>
 
     <!-- Main Content -->
-		{% if user.is_authenticated %}
 		<div class="container mt-4">
         {% block content %}
         {% endblock %}
 		</div>
-		{% else %}
-{% include 'auth/login.html' %}
-		{% endif %}
 
     <!-- Footer -->
     <footer class="footer bg-light mt-4 py-3">
