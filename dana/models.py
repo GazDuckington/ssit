@@ -28,6 +28,12 @@ class Divisi(models.Model):
         self.is_del = YesNo.YES.value
         self.save(update_fields=["is_del"])
 
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self) -> str:
+        return f"{self.nama}"
+
 
 class Nasabah(models.Model):
     class Meta:
@@ -46,6 +52,12 @@ class Nasabah(models.Model):
         self.is_del = YesNo.YES.value
         self.save(update_fields=["is_del"])
 
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self) -> str:
+        return f"{self.nama}-{self.divisi.nama} ({self.uid.username})"
+
 
 class Metode(models.Model):
     class Meta:
@@ -61,6 +73,12 @@ class Metode(models.Model):
     def delete(self, using=None, keep_parents=False):
         self.is_del = YesNo.YES.value
         self.save(update_fields=["is_del"])
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self) -> str:
+        return f"{self.nama}"
 
 
 class Pengajuan(models.Model):
@@ -80,6 +98,15 @@ class Pengajuan(models.Model):
         self.is_del = YesNo.YES.value
         self.save(update_fields=["is_del"])
 
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return f"{self.user.name}, {self.format_as_idr()}"
+
+    def format_as_idr(self):
+        return f"Rp {self.nominal:,.2f}".replace(",", ".").replace(".00", "")
+
 
 class LogPengajuan(models.Model):
     class Meta:
@@ -91,6 +118,15 @@ class LogPengajuan(models.Model):
     metode = models.ForeignKey(Metode, on_delete=models.CASCADE)
     nominal = models.FloatField()
     tanggal = models.DateTimeField(default=datetime.now())
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return f"{self.user.name}, {self.format_as_idr()}"
+
+    def format_as_idr(self):
+        return f"Rp {self.nominal:,.2f}".replace(",", ".").replace(".00", "")
 
 
 # triggers
