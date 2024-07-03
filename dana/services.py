@@ -5,6 +5,9 @@ from dana.models import Pengajuan, YesNo
 class ServicePengajuan:
     def get_pengajuan(self, **kwargs):
         try:
+            id = kwargs.get("id", None)
+            if id is not None and isinstance(id, str):
+                kwargs["id"] = uuid.UUID(id)
             pengajuan = Pengajuan.objects.get(kwargs, is_del=YesNo.NO.value)
             return pengajuan, None
         except Exception as e:
