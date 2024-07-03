@@ -1,0 +1,53 @@
+# version: "0.1"
+
+services:
+    backend:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        hostname: backend
+        working_dir: /app
+        entrypoint: [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
+        volumes:
+            - .:/app
+        ports:
+            - 3035:8000
+        env_file:
+            - ./.env
+        depends_on:
+            - redis
+            - postgres
+        networks:
+            - ssit_net
+
+    postgres:
+        image: postgres:13-alpine
+        hostname: postgresdb
+        restart: unless-stopped
+        volumes:
+            - postgres:/var/lib/postgresql/
+        ports:
+            - "5432:5432"
+        env_file:
+            - ./.env
+        environment:
+            - "POSTGRES_USER=${DB_USERNAME}"
+            - "POSTGRES_PASSWORD=${DB_PASSWORD}"
+            - "POSTGRES_DB=${DB_NAME}"
+        networks:
+            - ssit_net
+
+    redis:
+        image: redis:7-alpine
+        hostname: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - ssit_net
+
+networks:
+    ssit_net:
+        driver: bridge
+
+volumes:
+    postgres: {}
