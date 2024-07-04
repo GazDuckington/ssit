@@ -96,6 +96,7 @@ class Pengajuan(models.Model):
     user = models.ForeignKey(Nasabah, on_delete=models.CASCADE)
     metode = models.ForeignKey(Metode, on_delete=models.CASCADE)
     is_del = models.SmallIntegerField(choices=YesNo.choices, default=YesNo.NO.value)
+    created = models.DateTimeField(default=datetime.now())
 
     def hard_delete(self):
         super(Pengajuan, self).delete()

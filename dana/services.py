@@ -35,7 +35,7 @@ class ServiceLogPengajuan:
             if id is not None and isinstance(id, str):
                 kwargs["id"] = uuid.UUID(id)
 
-            pengajuan = LogPengajuan.objects.filter(**kwargs)
+            pengajuan = LogPengajuan.objects.filter(**kwargs).order_by("-tanggal")
             print(kwargs, pengajuan.query)
             return pengajuan, None
         except LogPengajuan.DoesNotExist:
@@ -64,7 +64,9 @@ class ServicePengajuan:
             id = kwargs.get("id", None)
             if id is not None and isinstance(id, str):
                 kwargs["id"] = uuid.UUID(id)
-            pengajuan = Pengajuan.objects.filter(**kwargs, is_del=YesNo.NO.value)
+            pengajuan = Pengajuan.objects.filter(
+                **kwargs, is_del=YesNo.NO.value
+            ).order_by("-created")
             return pengajuan, None
         except Pengajuan.DoesNotExist:
             return None, "pengajuan does not exists"
@@ -106,18 +108,15 @@ class ServicePengajuan:
             raise e
             # return None, f"error updating pengajuan: {e}"
 
-    def delete_pengajuan(self, id):
+    def delete_pengajuan(self, pengajuan: Pengajuan):
         try:
-            id_uuid = uuid.UUID(id)
-            pengajuan, err = self.get_pengajuan(id=id_uuid)
-            if err is not None:
-                return err
             if pengajuan:
                 if pengajuan.is_del == YesNo.YES.value:
-                    return False, f"{id} already deleted"
+                    return False, f"{pengajuan.id} already deleted"
                 pengajuan.delete()
+                print(f"{pengajuan.id} deleted")
                 return True, None
             else:
-                return False, None
+                return False, "pengajuan is empty"
         except Exception as e:
             return False, f"Error deleting pengajuan: {e}"

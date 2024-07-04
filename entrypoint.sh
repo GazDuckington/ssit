@@ -9,6 +9,12 @@ echo "migrating ..."
 python manage.py makemigrations
 python manage.py migrate
 
+echo "creating superuser..."
+python manage.py createsu
+
+echo "init metode and divisi..."
+python manage.py initdata
+
 echo "starting django server..."
 python manage.py runserver 0.0.0.0:8000
 

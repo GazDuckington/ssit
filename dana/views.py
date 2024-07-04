@@ -53,7 +53,13 @@ class Pengajuan(LoginRequiredMixin, View):
             }
             return render(request, "pengajuan/logs.html", context)
         except Exception as e:
-            raise e
+            context = {
+                "status": False,
+                "message": f"something went wrong: {e}",
+                "data": [],
+                "form": PengajuanForm(),
+            }
+            return render(request, "pengajuan/logs.html", context)
 
     def post(self, request):
         try:
@@ -64,11 +70,10 @@ class Pengajuan(LoginRequiredMixin, View):
             if err is not None:
                 context = {"status": False, "message": "error", "data": err}
             context = {"status": True, "message": "success", "data": new_pengajuan}
-            return self.get(request)
+            print(f"create: {context}")
+            return redirect("pengajuan")
         except Exception as e:
             raise e
-
-    def delete(self, request): ...
 
 
 class UpdatePengajuan(LoginRequiredMixin, View):
@@ -119,6 +124,55 @@ class UpdatePengajuan(LoginRequiredMixin, View):
             else:
                 context = {"status": False, "message": "pengajuan is empty"}
             print(f"update: {id}", context)
+            return redirect("pengajuan")
+        except Exception as e:
+            raise e
+
+
+class DeletePengajuan(LoginRequiredMixin, View):
+    login_url = reverse_lazy("login")
+    service = ServicePengajuan()
+    log_service = ServiceLogPengajuan()
+
+    def post(self, request, id):
+        try:
+            pengajuan, err = self.service.get_pengajuan(id=id)
+            if err is not None:
+                context = {"status": False, "message": err, "data": {}}
+
+            if pengajuan is None:
+                context = {"status": False, "message": "pengajuan is empty"}
+                return JsonResponse(context, status=400)
+
+            if pengajuan is not None:
+                deleted_pengajuan, err = self.service.delete_pengajuan(pengajuan)
+                if err is not None:
+                    context = {"status": False, "message": err}
+                if deleted_pengajuan is False:
+                    context = {
+                        "status": False,
+                        "message": f"failed to delete pengajuan {pengajuan.id}",
+                    }
+
+                context = {
+                    "status": True,
+                    "message": "success",
+                }
+
+                if pengajuan:
+                    log = {
+                        "pengajuan": pengajuan,
+                        "metode": pengajuan.metode,
+                        "nominal": pengajuan.nominal,
+                        "user": pengajuan.user,
+                        "action": Action.DELETE.value,
+                    }
+                    err = self.log_service.create_log_pengajuan(**log)
+                    if err is not None:
+                        print(f"error creating log: {err}")
+            else:
+                context = {"status": False, "message": "pengajuan is empty"}
+            print(f"delete: {context}")
             return redirect("pengajuan")
         except Exception as e:
             raise e
