@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}History - UniPay{% endblock %}
+{% block content %}
+	{% if status %}
+		{% for obj in data %}
+			{{ obj }}
+		{% endfor %}
+	{% else %}
+		{{ message }}
+	{% endif %}
+{% endblock %}

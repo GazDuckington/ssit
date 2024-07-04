@@ -4,3 +4,6 @@ __pycache__/
 dana/__pycache__
 .env
 ssit/__pycache__
+authentication/__pycache__
+authentication/migrations/__pycache__
+dana/migrations/__pycache__

@@ -1,5 +1,5 @@
 import uuid
-from dana.models import Pengajuan, YesNo
+from dana.models import LogPengajuan, Pengajuan, YesNo
 
 
 class ServicePengajuan:
@@ -10,6 +10,8 @@ class ServicePengajuan:
                 kwargs["id"] = uuid.UUID(id)
             pengajuan = Pengajuan.objects.get(kwargs, is_del=YesNo.NO.value)
             return pengajuan, None
+        except Pengajuan.DoesNotExist:
+            return {}, None
         except Exception as e:
             return None, f"error getting pengajuan: {e}"
 
@@ -52,3 +54,29 @@ class ServicePengajuan:
                 return False, None
         except Exception as e:
             return False, f"Error deleting pengajuan: {e}"
+
+
+class ServiceLogPengajuan:
+    def get_log_pengajuan(self, **kwargs):
+        try:
+            id = kwargs.get("id", None)
+            if id is not None and isinstance(id, str):
+                kwargs["id"] = uuid.UUID(id)
+            pengajuan = LogPengajuan.objects.get(kwargs)
+            return pengajuan, None
+        except LogPengajuan.DoesNotExist:
+            return {}, None
+        except Exception as e:
+            return None, f"error getting log pengajuan: {e}"
+
+    def filter_log_pengajuan(self, **kwargs):
+        try:
+            id = kwargs.get("id", None)
+            if id is not None and isinstance(id, str):
+                kwargs["id"] = uuid.UUID(id)
+            pengajuan = LogPengajuan.objects.filter(kwargs)
+            return pengajuan, None
+        except LogPengajuan.DoesNotExist:
+            return [], None
+        except Exception as e:
+            return None, f"error getting log pengajuan: {e}"

@@ -12,7 +12,7 @@ COPY requirements.txt /app/
 
 RUN pip install -r requirements.txt
 
-RUN apt install tzdata
+RUN apt install -y tzdata netcat
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 
@@ -28,4 +28,4 @@ COPY ./entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["bash", "/entrypoint.sh"]
+ENTRYPOINT ["sh", "-c", "/entrypoint.sh"]
