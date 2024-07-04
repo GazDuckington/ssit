@@ -12,6 +12,12 @@ class YesNo(models.IntegerChoices):
     NO = "0", "No"
 
 
+class Action(models.TextChoices):
+    CREATE = "create", "Create"
+    UPDATE = "update", "Update"
+    DELETE = "delete", "Delete"
+
+
 # Create your models here.
 class Divisi(models.Model):
     class Meta:
@@ -102,10 +108,10 @@ class Pengajuan(models.Model):
         return repr(self)
 
     def __repr__(self):
-        return f"{self.user.name}, {self.format_as_idr()}"
+        return f"{self.user.nama}, {self.nominal} ({self.metode.nama})"
 
     def format_as_idr(self):
-        return f"Rp {self.nominal:,.2f}".replace(",", ".").replace(".00", "")
+        return f"Rp {self.nominal:,.0f}".replace(",", ".")
 
 
 class LogPengajuan(models.Model):
@@ -118,24 +124,13 @@ class LogPengajuan(models.Model):
     metode = models.ForeignKey(Metode, on_delete=models.CASCADE)
     nominal = models.FloatField()
     tanggal = models.DateTimeField(default=datetime.now())
+    action = models.CharField(default=Action.CREATE.value, choices=Action.choices)
 
     def __str__(self):
         return repr(self)
 
     def __repr__(self):
-        return f"{self.user.name}, {self.format_as_idr()}"
+        return f"{self.user.nama}, {self.nominal}"
 
     def format_as_idr(self):
-        return f"Rp {self.nominal:,.2f}".replace(",", ".").replace(".00", "")
-
-
-# triggers
-@receiver(post_init, sender=Pengajuan)
-@receiver(post_save, sender=Pengajuan)
-def create_log_pengajuan(sender, instance, **kwargs):
-    LogPengajuan.objects.create(
-        pengajuan=instance,
-        user=instance.user,
-        metode=instance.metode,
-        nominal=instance.nominal,
-    )
+        return f"Rp {self.nominal:,.0f}".replace(",", ".")

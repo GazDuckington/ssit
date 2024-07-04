@@ -2,10 +2,106 @@
 {% block title %}History - UniPay{% endblock %}
 {% block content %}
 	{% if status %}
-		{% for obj in data %}
-			{{ obj }}
-		{% endfor %}
-	{% else %}
+
+<h2>Buat Pengajuan</h2>
+		<form action="{% url 'pengajuan' %}" method="post">
+				{% csrf_token %}
+				{{ form.as_p }}
+				<button type="submit">Ajukan</button>
+		</form>
+
+<h2>Daftar Pengajuan Aktif, {{ user }}</h2>
+<table class="table">
+	<thead>
+		<th>Nama</th>
+		<th>Nominal</th>
+		<th>
+			Metode
+		</th>
+		<th>Options</th>
+	</thead>
+	<tbody>
+
+            {% for obj in pengajuan %}
+                <tr>
+                    <td>{{ obj.user.nama }}</td>
+                    <td>{{ obj.format_as_idr }}</td>
+                    <td>{{ obj.metode.nama }}</td>
+
+											<td>
+                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal{{ obj.id }}">
+                                Edit
+                            </button>
+											</td>
+
+								<div class="modal fade" id="editModal{{ obj.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ obj.id }}" aria-hidden="true">
+										<div class="modal-dialog" role="document">
+												<div class="modal-content">
+														<div class="modal-header">
+																<h5 class="modal-title" id="editModalLabel{{ obj.id }}">Edit Pengajuan</h5>
+																<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																		<span aria-hidden="true">&times;</span>
+																</button>
+														</div>
+														<div class="modal-body">
+																<!-- Form for editing Pengajuan -->
+																<form id="editForm{{ obj.id }}" action="{% url 'pengajuan_update' obj.id %}" method="post">
+																		{% csrf_token %}
+																		<input type="hidden" name="_method" value="PUT">
+																		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+																		<input type="hidden" name="id" value="{{ obj.id }}">
+																		<label for="id_nominal">Nominal:</label>
+																		<input type="text" id="id_nominal" name="nominal" value="{{ obj.nominal }}">
+																		<label for="id_metode">Metode:</label>
+																		<select id="id_metode" name="metode">
+																				{% for metode in metodes %}
+																						<option value="{{ metode.id }}" {% if obj.metode.id == metode.id %} selected {% endif %}>
+																							{{ metode.nama }}
+																						</option>
+																				{% endfor %}
+																		</select>
+																		<button type="submit" class="btn btn-primary">Save Changes</button>
+																</form>
+														</div>
+												</div>
+										</div>
+									</div>
+            {% endfor %}
+		</tr>
+	</tbody>
+</table>
+<h2>Log Pengajuan {{ user }}</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Divisi</th>
+                <th>Nominal</th>
+                <th>Metode</th>
+								<th>History</th>
+								<th>Expired</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obj in data %}
+                <tr>
+										<td>{{ obj.tanggal }}</td>
+                    <td>{{ obj.user.divisi }}</td>
+                    <td>{{ obj.format_as_idr }}</td>
+                    <td>{{ obj.metode.nama }}</td>
+										<td>{{ obj.action }}</td>
+										{% if obj.pengajuan.is_del == 1 %}
+											<td>Expired</td>
+										{% else %}
+										{% endif %}
+                </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
 		{{ message }}
 	{% endif %}
+
+
 {% endblock %}
