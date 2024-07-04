@@ -22,7 +22,7 @@ class LoginView(View):
                 if User.objects.filter(pk=user.pk, is_superuser=True).exists():
                     return redirect("admin:index")
                 else:
-                    return redirect("greet-dana")
+                    return redirect("pengajuan")
         return render(request, "auth/login.html", {"form": form})
 
 

@@ -49,3 +49,8 @@ python manage.py createsuperuser
 - go to "Nasabahs" in "DANA"
 
 - create new nasabah
+
+4. use as user
+
+- login as previously registered user
+- start using the application
